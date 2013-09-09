@@ -14,6 +14,7 @@ Group:      Development/Tools
 License:    GPLv2
 URL:        git://gitorious.org/maemo-tools/libsysperf
 Source0:    %{name}-v%{version}.tar.gz
+Source1:    _src
 Source100:  libsysperf.yaml
 BuildRequires:  python
 
