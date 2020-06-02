@@ -2,9 +2,8 @@ Name:       libsysperf
 Summary:    Static helper library for CVS and proc file handling
 Version:    0.2.4.2
 Release:    1
-Group:      Development/Tools
 License:    GPLv2
-URL:        git://gitorious.org/maemo-tools/libsysperf
+URL:        https://github.com/mer-tools/libsysperf
 Source0:    %{name}-%{version}.tar.gz
 BuildRequires:  python
 
@@ -13,7 +12,6 @@ Static helper library for CSV and /proc/ file handling, used by some sp-* tools
 
 %package devel
 Summary:    Header files for libsysperf
-Group:      Development/Tools
 Requires:   %{name} = %{version}-%{release}
 Requires:   %{name} = %{version}
 
