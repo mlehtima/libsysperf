@@ -26,7 +26,7 @@ Header files needed to build against libsysperf
 
 %install
 rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
+make install DESTDIR=%{buildroot} LIB=%{_libdir}
 
 %files
 %defattr(-,root,root,-)
