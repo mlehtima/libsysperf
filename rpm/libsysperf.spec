@@ -1,6 +1,6 @@
 Name:       libsysperf
 Summary:    Static helper library for CVS and proc file handling
-Version:    0.2.4.2
+Version:    0.2.4.3
 Release:    1
 License:    GPLv2
 URL:        https://github.com/mer-tools/libsysperf
