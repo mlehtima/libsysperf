@@ -5,7 +5,8 @@ Release:    1
 License:    GPLv2
 URL:        https://github.com/mer-tools/libsysperf
 Source0:    %{name}-%{version}.tar.gz
-BuildRequires:  python
+Requires:   python3-base
+BuildRequires:  python3-base
 
 %description
 Static helper library for CSV and /proc/ file handling, used by some sp-* tools
@@ -25,7 +26,6 @@ Header files needed to build against libsysperf
 # build gets done with make install
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot} LIB=%{_libdir}
 
 %files

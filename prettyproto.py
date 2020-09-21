@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
         k = n.split('_')[0]
 
-        if not m.has_key(k):
+        if k not in m:
             m[k] = []
             o.append(k)
 
@@ -87,12 +87,12 @@ if __name__ == "__main__":
     for k in o:
         v = m[k]
 
-        print ""
-        print "/* -- %s -- */" % k
-        print ""
-        i = max(map(lambda x:len(x[0]), v))
-        k = max(map(lambda x:len(x[1]), v))
-        l = max(map(lambda x:len(x[2]), v))
+        print("")
+        print("/* -- %s -- */" % k)
+        print("")
+        i = max([len(x[0]) for x in v])
+        k = max([len(x[1]) for x in v])
+        l = max([len(x[2]) for x in v])
 
         for t,p,n,a in v:
-            print "%-*s%-*s%-*s%s" % (i,t,k,p,l,n,a)
+            print("%-*s%-*s%-*s%s" % (i,t,k,p,l,n,a))

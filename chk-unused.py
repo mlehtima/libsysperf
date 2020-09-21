@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -66,4 +66,4 @@ if __name__ == "__main__":
 
     unused.sort()
 
-    print string.join(unused, "\\\n")
+    print("\\\n".join(unused))

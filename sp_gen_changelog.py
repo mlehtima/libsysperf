@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -120,7 +120,7 @@ COPYRIGHT
 SEE ALSO
 """
 def tool_version():
-    print TOOL_VERS
+    print(TOOL_VERS)
     sys.exit(0)
 
 def tool_usage():
@@ -139,16 +139,16 @@ msg_verbose  = 2
 
 def msg_emit(lev,tag,msg):
     if msg_verbose >= lev:
-        msg = string.split(msg,"\n")
-        msg = map(string.rstrip, msg)
+        msg = msg.split("\n")
+        msg = list(map(str.rstrip, msg))
         while msg and msg[-1] == "":
             msg.pop()
 
         pad = "|" + " " * (len(tag)-1)
 
         for s in msg:
-            s = string.expandtabs(s)
-            print>>sys.stderr, "%s%s" % (tag, s)
+            s = s.expandtabs()
+            print("%s%s" % (tag, s), file=sys.stderr)
             tag = pad
 
 def msg_fatal(msg):
@@ -176,7 +176,7 @@ def msg_less_verbose():
     global msg_verbose
     msg_verbose -= 1
 
-COMBINE_WEEK = 01
+COMBINE_WEEK = 0o1
 
 #----------------------------------------------------------------
 # make sure locale will not affect our dates...
@@ -184,7 +184,7 @@ m_num = {}
 m_str = ('-',
 'Jan','Feb','Mar','Apr','May','Jun',
 'Jul','Aug','Sep','Oct','Nov','Dec')
-for m in m_str: m_num[string.upper(m)] = len(m_num)
+for m in m_str: m_num[m.upper()] = len(m_num)
 
 #----------------------------------------------------------------
 def index_to_month(m):
@@ -198,7 +198,7 @@ def index_to_month(m):
 def month_to_index(m):
     "Convert: 'Feb' or '02' or '2' -> 2"
 
-    i = m_num.get(string.upper(m), None)
+    i = m_num.get(m.upper(), None)
     return i or int(m,10)
 
 #----------------------------------------------------------------
@@ -233,7 +233,7 @@ def date_to_week(ymd):
 def get_date(s):
     "Convert: '12-Sep-2004' -> (2004,9,12)"
 
-    s = string.split(s,'-')
+    s = s.split('-')
     if len(s) == 3:
         try:
             d = int(s[0])
@@ -265,8 +265,8 @@ def content(path):
     "Reversed list of textlines from file"
 
     v = open(path).readlines()
-    v = map(string.rstrip, v)
-    v = map(string.expandtabs, v)
+    v = list(map(str.rstrip, v))
+    v = list(map(str.expandtabs, v))
     v.reverse()
     return v
 
@@ -319,7 +319,7 @@ class LogEntry:
         v.append("A:%s"%self.auth)
         v.append("D:%s"%str(self.date))
         v.append("E:%s" % string.replace(self.text,"\n","\\n"))
-        return string.join(v)
+        return "".join(v)
 
     def add(self, text):
         n = min(self.left, spaces(text))
@@ -383,18 +383,18 @@ def combine(entries):
             k = e.week,e.auth,e.text
         else:
             k = e.date,e.auth,e.text
-        if not m.has_key(k):
+        if k not in m:
             m[k] = e
         else:
             m[k].file.extend(e.file)
 
     del entries[:]
-    entries.extend(m.values())
+    entries.extend(list(m.values()))
 
     for e in entries:
         m = {}
         for f in e.file: m[f] = None
-        e.file = m.keys()
+        e.file = list(m.keys())
         e.file.sort()
 
 #----------------------------------------------------------------
@@ -441,7 +441,7 @@ def filelist(file, text):
     rows[-1][-1] += ":"
 
     for blk in rows:
-        text.append(string.join(blk))
+        text.append("".join(blk))
 
 #----------------------------------------------------------------
 
@@ -475,7 +475,7 @@ def generate(entries):
                 file = None
                 auth = None
                 _(bar1)
-                _("%s" % `date`)
+                _("%s" % repr(date))
                 _(bar1)
 
         if file != e.file:
@@ -488,12 +488,12 @@ def generate(entries):
             auth = e.auth
             _(" "*4 + "%s" % auth)
 
-        text = string.split(e.text,"\n")
+        text = e.text.split("\n")
         for i in text:
             _(" "*8 + "%s" % i)
 
     _("")
-    return string.join(res, "\n")
+    return "\n".join(res)
 
 # ============================================================================
 # Main Entry Point
@@ -523,7 +523,7 @@ def main():
 
         if arg[:2] == "--":
             if '=' in arg:
-                key,val = string.split(arg,"=",1)
+                key,val = arg.split("=",1)
             else:
                 key,val = arg, ""
         else:
@@ -558,5 +558,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print>>sys.stderr, "User Break"
+        print("User Break", file=sys.stderr)
         sys.exit(1)

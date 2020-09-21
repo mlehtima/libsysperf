@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -132,7 +132,7 @@ COPYRIGHT
 SEE ALSO
 """
 def tool_version():
-    print TOOL_VERS
+    print(TOOL_VERS)
     sys.exit(0)
 
 def tool_usage():
@@ -151,16 +151,16 @@ msg_verbose  = 3
 
 def msg_emit(lev,tag,msg):
     if msg_verbose >= lev:
-        msg = string.split(msg,"\n")
-        msg = map(string.rstrip, msg)
+        msg = msg.split("\n")
+        msg = list(map(str.rstrip, msg))
         while msg and msg[-1] == "":
             msg.pop()
 
         pad = "|" + " " * (len(tag)-1)
 
         for s in msg:
-            s = string.expandtabs(s)
-            print>>sys.stderr, "%s%s" % (tag, s)
+            s = s.expandtabs()
+            print("%s%s" % (tag, s), file=sys.stderr)
             tag = pad
 
 def msg_fatal(msg):
@@ -295,8 +295,8 @@ latin1_to_html = {
 def slice(txt,sep,cnt):
     if txt == None:
         return [None] * cnt
-    v = string.split(txt,sep,cnt-1)
-    v = map(string.strip, v)
+    v = txt.split(sep,cnt-1)
+    v = list(map(str.strip, v))
     while len(v) < cnt:
         v.append(None)
     return v
@@ -315,7 +315,7 @@ def heading_level(text):
     # return corresponding heading level
 
     c = text[:1]
-    if heading_level_lut.has_key(c):
+    if c in heading_level_lut:
         if text.count(c) == len(text):
             return heading_level_lut[c]
     return TXT
@@ -364,7 +364,7 @@ def read_file(path):
 ## QUARANTINE   srce = sys.stdin.readlines()
 ## QUARANTINE     else:
 ## QUARANTINE   srce = open(path).readlines()
-## QUARANTINE     srce = map(string.rstrip, srce)
+## QUARANTINE     srce = map(str.rstrip, srce)
 ## QUARANTINE     srce = map(string.expandtabs, srce)
 ## QUARANTINE
 ## QUARANTINE     i,n = 0,len(srce)
@@ -410,7 +410,7 @@ def read_file(path):
 
 # ----------------------------------------------------------------
 def get_heading_rows(rows):
-    return filter(lambda x:x[0]>TXT, rows)
+    return [x for x in rows if x[0]>TXT]
 
 # ----------------------------------------------------------------
 def enum_heading_rows(rows):
@@ -423,7 +423,7 @@ def enum_heading_rows(rows):
         lev = r[0]
         cnt[lev-1] += 1
         cnt = cnt[:lev] + clr[lev:]
-        r[2] = string.join(map(str, cnt[:lev]),".")
+        r[2] = ".".join(list(map(str, cnt[:lev])))
 
 # ----------------------------------------------------------------
 # Row type predicates
@@ -454,8 +454,8 @@ def filter_empty_rows(srce):
 
 # ----------------------------------------------------------------
 def html_escape(text):
-    text = map(lambda c: latin1_to_html.get(c,c), text)
-    return string.join(text,"")
+    text = [latin1_to_html.get(c,c) for c in text]
+    return "".join(text)
 
     text = string.replace(text, "&", "&amp;")
     text = string.replace(text, "<", "&lt;")
@@ -477,7 +477,7 @@ def img_html(_,arg):
         alt,img = arg.split("::",1)
     else:
         alt,img = "",arg
-    alt,img = map(string.strip, (alt,img))
+    alt,img = list(map(str.strip, (alt,img)))
     base = os.path.splitext(img)[0]
     cmap = base + ".cmap"
     if os.path.exists(cmap):
@@ -525,7 +525,7 @@ def to_html(srce, title=None):
     while stk.pop() > 0:
         _("</ul>")
 
-    toc = string.join(toc, "\n")
+    toc = "\n".join(toc)
 
     # generate HTML body from source text
 
@@ -558,7 +558,7 @@ def to_html(srce, title=None):
             elif tag == "::IMG":
                 img_html(_,arg)
             elif tag == "::LINK":
-                arg = map(string.strip, arg.split("::",1))
+                arg = list(map(str.strip, arg.split("::",1)))
                 link = arg.pop()
                 if arg:
                     name = arg.pop()
@@ -567,7 +567,7 @@ def to_html(srce, title=None):
                 name = html_escape(name)
                 txt = '<a href="%s">%s</a>' % (link, name)
             else:
-                print>>sys.stderr, "Unknown TAG: %s" % repr(tag)
+                print("Unknown TAG: %s" % repr(tag), file=sys.stderr)
                 sys.exit(1)
 
             if txt != None:
@@ -595,7 +595,7 @@ def to_html(srce, title=None):
     _("</html>")
     _("")
 
-    return string.join(dest, "\n")
+    return "\n".join(dest)
 
 # ----------------------------------------------------------------
 def to_text(srce, title="<no title>"):
@@ -617,7 +617,7 @@ def to_text(srce, title="<no title>"):
         pad  = "    " * (len(stk)-1)
         _(pad + tag)
 
-    toc = string.join(toc, "\n")
+    toc = "\n".join(toc)
 
     # re-format source text
 
@@ -642,12 +642,12 @@ def to_text(srce, title="<no title>"):
             elif tag == "::TOC":
                 txt = toc
             elif tag == "::LINK":
-                arg = map(string.strip, arg.split("::",1))
+                arg = list(map(str.strip, arg.split("::",1)))
                 txt = "<%s>" % arg.pop()
                 if arg:
                     txt = "%s\n%s" % (arg.pop(), txt)
             else:
-                print>>sys.stderr, "Unknown TAG: %s" % repr(tag)
+                print("Unknown TAG: %s" % repr(tag), file=sys.stderr)
                 sys.exit(1)
 
             if txt != None:
@@ -664,7 +664,7 @@ def to_text(srce, title="<no title>"):
 
     _("")
 
-    dest = string.join(dest, "\n")
+    dest = "\n".join(dest)
     i,n = 0, len(dest)
     while i < n and dest[i] == "\n":
         i += 1
@@ -697,7 +697,7 @@ def main():
 
         if arg[:2] == "--":
             if '=' in arg:
-                key,val = string.split(arg,"=",1)
+                key,val = arg.split("=",1)
             else:
                 key,val = arg, ""
         else:
@@ -750,7 +750,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print>>sys.stderr, "User Break"
+        print("User Break", file=sys.stderr)
         sys.exit(1)
 
 ###

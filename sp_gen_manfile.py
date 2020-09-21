@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -140,7 +140,7 @@ SEE ALSO
   man(1)
 """
 def tool_version():
-    print TOOL_VERS
+    print(TOOL_VERS)
     sys.exit(0)
 
 def tool_usage():
@@ -159,16 +159,16 @@ msg_verbose  = 3
 
 def msg_emit(lev,tag,msg):
     if msg_verbose >= lev:
-        msg = string.split(msg,"\n")
-        msg = map(string.rstrip, msg)
+        msg = msg.split("\n")
+        msg = list(map(str.rstrip, msg))
         while msg and msg[-1] == "":
             msg.pop()
 
         pad = "|" + " " * (len(tag)-1)
 
         for s in msg:
-            s = string.expandtabs(s)
-            print>>sys.stderr, "%s%s" % (tag, s)
+            s = s.expandtabs()
+            print("%s%s" % (tag, s), file=sys.stderr)
             tag = pad
 
 def msg_fatal(msg):
@@ -244,18 +244,18 @@ def normalize_version(vers):
     if len(v) != 3:
         msg_fatal("version string '%s' not format 1.2.3" % vers)
     try:
-        v = map(int, v)
+        v = list(map(int, v))
     except ValueError:
         msg_fatal("version string '%s' not format 1.2.3" % vers)
-    return string.join(map(str, v), ".")
+    return ".".join(list(map(str, v)))
 
 # ----------------------------------------------------------------------------
 def readlines(file):
     "read & normalize text file contents"
 
     text = file.readlines()
-    text = map(string.expandtabs, text)
-    text = map(string.rstrip, text)
+    text = list(map(str.expandtabs, text))
+    text = list(map(str.rstrip, text))
     return text
 
 # ----------------------------------------------------------------------------
@@ -281,7 +281,7 @@ def normalize_sections(secs):
                 n = c
     if n:
         for s in secs:
-            s[1] = map(lambda x:x[n:], s[1])
+            s[1] = [x[n:] for x in s[1]]
 
 # ----------------------------------------------------------------------------
 def collect_section(secs, name):
@@ -367,7 +367,7 @@ def parse_help_output(text, stab):
 
     for s in (" -- ", " - "):
         if s in name:
-            name, brief = map(string.strip, name.split(s,1))
+            name, brief = list(map(str.strip, name.split(s,1)))
             break
 
     s = name.split()
@@ -462,7 +462,7 @@ def parse_help_output(text, stab):
     # - - - - - - - - - - - - - - - - - - - - - - - -
 
     # original order
-    orig = map(lambda x:x[0], secs)
+    orig = [x[0] for x in secs]
 
     # reorganize
 
@@ -472,19 +472,19 @@ def parse_help_output(text, stab):
     secs = head + secs + tail
 
     # compare with original
-    used = map(lambda x:x[0], secs)
+    used = [x[0] for x in secs]
 
     # ... but ignore stuff we have already warned about
     tags = missing+empty
-    orig = filter(lambda x:not x in tags, orig)
-    used = filter(lambda x:not x in tags, used)
+    orig = [x for x in orig if not x in tags]
+    used = [x for x in used if not x in tags]
 
     if orig != used:
         while len(used) < len(orig):
             used.append("(none)")
         while len(orig) < len(used):
             orig.append("(none)")
-        n = max(map(len, orig))
+        n = max(list(map(len, orig)))
         r = ["section order shuffled:"]
         for a,b in zip(orig, used):
             if a == b:
@@ -494,7 +494,7 @@ def parse_help_output(text, stab):
                 sep = "<-->"
 
             r.append("%-*s %s %s" % (n,a,sep,b))
-        r = string.join(r,"\n")
+        r = "\n".join(r)
         msg_warning(r)
 
     return name,vers,secs
@@ -529,8 +529,8 @@ def man_generate(text, stab):
     manual  = tag.get(section, "Unknown")
 
     t = [title, section, date, source, manual]
-    t = map(man_escape, t)
-    _('.TH "%s"' % string.join(t, '" "'))
+    t = list(map(man_escape, t))
+    _('.TH "%s"' % '" "'.join(t))
 
     for sec,rows in secs:
         _('.SH %s' % man_escape(sec))
@@ -552,7 +552,7 @@ def man_generate(text, stab):
     # Concatenate rows & write output
 
     out.append('')
-    out = string.join(out, "\n")
+    out = "\n".join(out)
 
     return out
 
@@ -586,7 +586,7 @@ def txt2man(stab):
         text = sys.stdin
 
     text = readlines(text)
-    text = filter(lambda x:x[:1]!='#', text)
+    text = [x for x in text if x[:1]!='#']
     text.reverse()
 
     man = man_generate(text, stab)
@@ -626,7 +626,7 @@ def main():
         arg = args.pop()
         if arg[:2] == "--":
             if '=' in arg:
-                key,val = string.split(arg,"=",1)
+                key,val = arg.split("=",1)
             else:
                 key,val = arg, ""
         else:
@@ -647,7 +647,7 @@ def main():
                 key,val = val.split('=',1)
             else:
                 key,val = val, ""
-            if not stab.has_key(key):
+            if key not in stab:
                 msg_warning("unknown define: %s" % repr(key))
             stab[key] = val
         else:
@@ -659,5 +659,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print>>sys.stderr, "User Break"
+        print("User Break", file=sys.stderr)
         sys.exit(1)

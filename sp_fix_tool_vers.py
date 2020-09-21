@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 # This file is part of libsysperf.
 #
@@ -122,7 +122,7 @@ COPYRIGHT
 SEE ALSO
 """
 def tool_version():
-    print TOOL_VERS
+    print(TOOL_VERS)
     sys.exit(0)
 
 def tool_usage():
@@ -141,16 +141,16 @@ msg_verbose  = 3
 
 def msg_emit(lev,tag,msg):
     if msg_verbose >= lev:
-        msg = string.split(msg,"\n")
-        msg = map(string.rstrip, msg)
+        msg = msg.split("\n")
+        msg = list(map(str.rstrip, msg))
         while msg and msg[-1] == "":
             msg.pop()
 
         pad = "|" + " " * (len(tag)-1)
 
         for s in msg:
-            s = string.expandtabs(s)
-            print>>sys.stderr, "%s%s" % (tag, s)
+            s = s.expandtabs()
+            print("%s%s" % (tag, s), file=sys.stderr)
             tag = pad
 
 def msg_fatal(msg):
@@ -201,11 +201,11 @@ def chk_tool_vers(vers):
     assert vers[0] == '"' and vers[-1] == '"'
 
     # sanity check: is it "minor.major.revision"
-    v = string.split(vers[1:-1], ".")
+    v = vers[1:-1].split(".")
     assert len(v) == 3
 
     # sanity check: minor, major, revision are integers
-    v = map(int, v)
+    v = list(map(int, v))
 
     return v
 
@@ -229,24 +229,24 @@ def fix_tool_vers(text, srce, vers):
 
     for i in range(len(text)):
         s = text[i]
-        s = string.split(s)
+        s = s.split()
 
         if len(s) < 3: continue
         if s[0] != "TOOL_VERS": continue
         if s[1] != "=": continue
 
         if VERBOSE:
-            print>>sys.stderr, "%s: %s -> %s" % (srce, s[2], vers)
+            print("%s: %s -> %s" % (srce, s[2], vers), file=sys.stderr)
 
         # check that old version looks valid
         chk_tool_vers(s[2])
 
         # replace with new version
         s[2] = vers
-        text[i] = string.join(s)
+        text[i] = "".join(s)
         break
     else:
-        print>>sys.stderr, "%s: WARNING: TOOL_VERS not found" % srce
+        print("%s: WARNING: TOOL_VERS not found" % srce, file=sys.stderr)
 
 def fix_tool_path(text, srce, libs):
     "fix module search path"
@@ -262,7 +262,7 @@ def fix_tool_path(text, srce, libs):
 
         # remove old modifications
         if s.find(tag) != -1:
-            print>>sys.stderr,"!!",s
+            print("!!",s, file=sys.stderr)
             del text[i]
             continue
 
@@ -275,12 +275,12 @@ def fix_tool_path(text, srce, libs):
         if s.find("import") != -1 and s.find("csvlib") != -1:
             text.insert(i, fix)
             if not hit:
-                print>>sys.stderr, "%s: WARNING: does not import sys" % srce
+                print("%s: WARNING: does not import sys" % srce, file=sys.stderr)
                 text.insert(i, "import sys " + tag)
             break
         i += 1
     else:
-        print>>sys.stderr, "%s: WARNING: does not use csvlib.py" % srce
+        print("%s: WARNING: does not use csvlib.py" % srce, file=sys.stderr)
 
 def fix_tool(srce, dest, vers, libs):
     # use default mode flags
@@ -289,14 +289,14 @@ def fix_tool(srce, dest, vers, libs):
     # read input
     if srce != None:
         orig = open(srce).read()
-        mode = os.stat(srce).st_mode & 0777
+        mode = os.stat(srce).st_mode & 0o777
     else:
         srce = "<stdin>"
         orig = sys.stdin.read()
 
     # split to lines
     text = orig.split('\n')
-    text = map(string.rstrip, text)
+    text = list(map(str.rstrip, text))
     while text and text[-1] == "":
         text.pop()
 
@@ -306,10 +306,10 @@ def fix_tool(srce, dest, vers, libs):
 
     # reconstruct file contents
     text.append("")
-    text = string.join(text, "\n")
+    text = "\n".join(text)
 
     if text == orig:
-        print>>sys.stderr, "%s: WARNING: fixed == original" % srce
+        print("%s: WARNING: fixed == original" % srce, file=sys.stderr)
 
     if dest != None:
         # files used
@@ -318,7 +318,7 @@ def fix_tool(srce, dest, vers, libs):
 
         # write to temp file
         if os.path.exists(temp):
-            print>>sys.stderr, "%s: FATAL: existing temp file" % srce
+            print("%s: FATAL: existing temp file" % srce, file=sys.stderr)
             sys.exit(1)
         open(temp,"w").write(text)
 
@@ -364,7 +364,7 @@ def main():
 
         if arg[:2] == "--":
             if '=' in arg:
-                key,val = string.split(arg,"=",1)
+                key,val = arg.split("=",1)
             else:
                 key,val = arg, ""
         else:
@@ -396,5 +396,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print>>sys.stderr, "User Break"
+        print("User Break", file=sys.stderr)
         sys.exit(1)
